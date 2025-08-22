@@ -1,7 +1,9 @@
+import html
 import os
 import base64
 from email.message import EmailMessage
 import requests
+from dotenv import load_dotenv
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -11,6 +13,9 @@ from googleapiclient.errors import HttpError
 
 from mcp.server.fastmcp import FastMCP
 import uvicorn
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Get the absolute path to the directory where this script is located,
 # ensuring that file paths are resolved correctly regardless of the
@@ -91,7 +96,11 @@ def send_email(recipient_email: str, subject: str, body: str) -> str:
         service = get_gmail_service()
         message = EmailMessage()
 
-        message.set_content(body)
+        # Convert plain text body to HTML for proper rendering
+        escaped_body = html.escape(body)
+        html_formatted_body = escaped_body.replace('\n', '<br>')
+        html_body = f"<html><body>{html_formatted_body}<br></body></html>"
+        message.set_content(html_body, subtype="html")
         message["To"] = recipient_email
         message["From"] = "me"  # 'me' is a special value that uses the authenticated user's email
         message["Subject"] = subject
@@ -167,7 +176,6 @@ def find_email_by_linkedin(linkedin_url: str) -> str:
         "person_linkedin_url": linkedin_url,
     }
     return _enrich_person(params)
-
 
 if __name__ == "__main__":
     mcp.run()

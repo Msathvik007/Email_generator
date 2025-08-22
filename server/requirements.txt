@@ -1,7 +1,8 @@
-mcp
-fastapi
-uvicorn
-pydantic
 google-api-python-client
 google-auth-httplib2
 google-auth-oauthlib
+uvicorn
+requests
+python-dotenv
+fastapi
+mcp[cli]>=1.12.3 
